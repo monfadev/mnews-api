@@ -1,11 +1,13 @@
-package news
+package repository
+
+import "mnewsapi/app/models"
 
 type Service interface {
-	FindAll() ([]News, error)
-	FindByID(ID int) (News, error)
-	Create(newsRequest NewsRequest) (News, error)
-	Update(ID int, newsRequest NewsUpdateRequest) (News, error)
-	Delete(ID int) (News, error)
+	FindAll() ([]models.News, error)
+	FindByID(ID int) (models.News, error)
+	Create(newsRequest models.NewsRequest) (models.News, error)
+	Update(ID int, newsRequest models.NewsUpdateRequest) (models.News, error)
+	Delete(ID int) (models.News, error)
 }
 
 type service struct {
@@ -16,17 +18,17 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) FindAll() ([]News, error) {
+func (s *service) FindAll() ([]models.News, error) {
 	news, err := s.repository.FindAll()
 	return news, err
 }
 
-func (s *service) FindByID(ID int) (News, error) {
+func (s *service) FindByID(ID int) (models.News, error) {
 	return s.repository.FindByID(ID)
 }
 
-func (s *service) Create(newsRequest NewsRequest) (News, error) {
-	new := News{
+func (s *service) Create(newsRequest models.NewsRequest) (models.News, error) {
+	new := models.News{
 		Title:       newsRequest.Title,
 		Description: newsRequest.Description,
 		Author:      newsRequest.Author,
@@ -37,7 +39,7 @@ func (s *service) Create(newsRequest NewsRequest) (News, error) {
 
 }
 
-func (s *service) Update(ID int, newsRequest NewsUpdateRequest) (News, error) {
+func (s *service) Update(ID int, newsRequest models.NewsUpdateRequest) (models.News, error) {
 	new, _ := s.repository.FindByID(ID)
 
 	new.Title = newsRequest.Title
@@ -50,7 +52,7 @@ func (s *service) Update(ID int, newsRequest NewsUpdateRequest) (News, error) {
 
 }
 
-func (s *service) Delete(ID int) (News, error) {
+func (s *service) Delete(ID int) (models.News, error) {
 	new, _ := s.repository.FindByID(ID)
 	news, err := s.repository.Delete(new)
 	return news, err

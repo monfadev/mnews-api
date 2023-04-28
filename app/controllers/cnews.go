@@ -1,85 +1,29 @@
-package handler
+package controllers
 
 import (
 	"fmt"
 	"net/http"
 	"strconv"
 
-	"mnewsapi/app/news"
+	"mnewsapi/app/models"
+	"mnewsapi/app/repository"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 type newsHandler struct {
-	newsService news.Service
+	newsService repository.Service
 }
 
-func NewNewsHandler(newsService news.Service) *newsHandler {
+func NewNewsHandler(newsService repository.Service) *newsHandler {
 	return &newsHandler{newsService}
 }
 
 func (h *newsHandler) RootHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"title":       "Bekasi Memiliki Internet Tercepat Se-Indonesia",
-		"description": "Laborum ipsum est officia anim reprehenderit in ad occaecat excepteur.",
-	})
-}
-
-func (h *newsHandler) HelloHandler(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"hello": "Hellow",
-	})
-}
-
-func (h *newsHandler) NewsHandler(ctx *gin.Context) {
-	title := ctx.Param("title")
-	desc := ctx.Param("desc")
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"title": title,
-		"desc":  desc,
-	})
-
-}
-
-func (h *newsHandler) QueryHandler(ctx *gin.Context) {
-	title := ctx.Query("title")
-	desc := ctx.Query("desc")
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"title": title,
-		"desc":  desc,
-	})
-}
-
-func (h *newsHandler) PostNewsHandler(ctx *gin.Context) {
-	var newsRequest news.NewsRequest
-
-	err := ctx.ShouldBindJSON(&newsRequest)
-	if err != nil {
-
-		errorMessages := []string{}
-		for _, e := range err.(validator.ValidationErrors) {
-			errorMessage := fmt.Sprintf("Error on field %s, condition %s", e.Field(), e.ActualTag())
-			errorMessages = append(errorMessages, errorMessage)
-		}
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"errors": errorMessages,
-		})
-		return
-	}
-
-	news, err := h.newsService.Create(newsRequest)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"errors": err,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": news,
+		"status":  http.StatusOK,
+		"message": "Selamat datang root",
 	})
 }
 
@@ -93,7 +37,7 @@ func (h *newsHandler) GetNews(ctx *gin.Context) {
 	}
 
 	// mengubah struct entity menjadi response
-	var newsResponse []news.NewsResponse
+	var newsResponse []models.NewsResponse
 
 	for _, n := range newsHandler {
 		newResponse := convertToNewsResponse(n)
@@ -126,7 +70,7 @@ func (h *newsHandler) GetNew(ctx *gin.Context) {
 }
 
 func (h *newsHandler) CreateNewsHandler(ctx *gin.Context) {
-	var newsRequest news.NewsRequest
+	var newsRequest models.NewsRequest
 
 	err := ctx.ShouldBindJSON(&newsRequest)
 	if err != nil {
@@ -156,7 +100,7 @@ func (h *newsHandler) CreateNewsHandler(ctx *gin.Context) {
 }
 
 func (h *newsHandler) UpdateNewsHandler(ctx *gin.Context) {
-	var newsUpdateRequest news.NewsUpdateRequest
+	var newsUpdateRequest models.NewsUpdateRequest
 
 	err := ctx.ShouldBindJSON(&newsUpdateRequest)
 	if err != nil {
@@ -208,8 +152,8 @@ func (h *newsHandler) DeleteNewsHandler(ctx *gin.Context) {
 
 }
 
-func convertToNewsResponse(newObject news.News) news.NewsResponse {
-	return news.NewsResponse{
+func convertToNewsResponse(newObject models.News) models.NewsResponse {
+	return models.NewsResponse{
 		ID:          newObject.ID,
 		Title:       newObject.Title,
 		Description: newObject.Description,

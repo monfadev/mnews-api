@@ -1,4 +1,4 @@
-package news
+package models
 
 type NewsResponse struct {
 	ID          int    `json:"id"`

@@ -1,4 +1,4 @@
-package news
+package models
 
 type NewsRequest struct {
 	Title       string `json:"title" binding:"required"`
